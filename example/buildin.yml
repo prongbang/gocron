@@ -1,0 +1,10 @@
+services:
+  gocron_buildin:
+    image: prongbang/gocron
+    container_name: gocron_buildin
+    environment:
+      - TZ=Asia/Bangkok
+      - GOCRON_BUILDIN=true
+      - GOCRON_SOURCE=file
+    volumes:
+      - "./configuration.yml:/app/configuration/configuration.yml"

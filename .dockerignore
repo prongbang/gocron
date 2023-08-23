@@ -1,0 +1,10 @@
+.gitignore
+README.md
+Makefile
+.DS_Store
+.git
+tmp
+.run
+.idea
+deployments
+example

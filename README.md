@@ -6,6 +6,18 @@ Gocron manages cron jobs with a configuration.
 
 ## Configuration with API
 
+- docker-compose.yml
+
+```yaml
+services:
+  gocron:
+    image: prongbang/gocron:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Asia/Bangkok
+```
+
 ### Create
 
 - `POST http://localhost:8000/v1/scheduler`
@@ -103,11 +115,6 @@ Response
 ## Configuration with BuildIn
 
 ```yml
-builtin: true
-
-api:
-  port: 9001
-
 schedulers:
   - job: "every-24-hours"
     cron: "0 0 * * *"
@@ -137,10 +144,9 @@ project
 services:
   gocron:
     image: prongbang/gocron:latest
-    ports:
-      - "8000:8000"
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_BUILDIN=true
       - GOCRON_SOURCE=file
     volumes:
       - "./configuration.yml:/app/configuration/configuration.yml"
@@ -154,10 +160,9 @@ services:
 services:
   gocron:
     image: prongbang/gocron:latest
-    ports:
-      - "8000:8000"
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_BUILDIN=true
       - GOCRON_SOURCE=remote
       - GOCRON_REMOTE_SECURE=true
       - GOCRON_REMOTE_PROVIDER=http://127.0.0.1:4001
@@ -174,10 +179,9 @@ services:
 services:
   gocron:
     image: prongbang/gocron:latest
-    ports:
-      - "8000:8000"
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_BUILDIN=true
       - GOCRON_SOURCE=remote
       - GOCRON_REMOTE_SECURE=true
       - GOCRON_REMOTE_PROVIDER=http://127.0.0.1:4001

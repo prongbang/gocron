@@ -16,14 +16,7 @@ const (
 )
 
 type Configuration struct {
-	ENV        string      `mapstructure:"env"`
-	BuildIn    bool        `mapstructure:"buildin"`
-	API        API         `mapstructure:"api"`
 	Schedulers []Scheduler `mapstructure:"schedulers"`
-}
-
-type API struct {
-	Port int `mapstructure:"port"`
 }
 
 type Scheduler struct {

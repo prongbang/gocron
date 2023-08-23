@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="develop" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="develop-buildin" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="gocron" />
     <working_directory value="$PROJECT_DIR$" />
     <envs>
-      <env name="GOCRON_SOURCE" value="file" />
+      <env name="GOCRON_SOURCE" value="file GOCRON_BUILDIN=true" />
     </envs>
     <kind value="PACKAGE" />
     <package value="github.com/prongbang/gocron/cmd/gocron" />

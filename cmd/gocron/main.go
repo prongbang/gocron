@@ -14,6 +14,7 @@ import (
 
 func main() {
 	source := os.Getenv("GOCRON_SOURCE")
+	buildIn, _ := strconv.ParseBool(os.Getenv("GOCRON_BUILDIN"))
 
 	if source == configuration.FileSource {
 		if err := configuration.Load(); err != nil {
@@ -32,7 +33,7 @@ func main() {
 		}
 	}
 
-	if configuration.Config.BuildIn {
+	if buildIn {
 		builtin.New().Register()
 	} else {
 		dbDriver := database.NewDatabaseDriver()

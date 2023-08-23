@@ -1,0 +1,8 @@
+services:
+  gocron_api:
+    image: prongbang/gocron
+    container_name: gocron_api
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Asia/Bangkok

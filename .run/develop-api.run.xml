@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="develop-api" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="gocron" />
+    <working_directory value="$PROJECT_DIR$" />
+    <kind value="PACKAGE" />
+    <package value="github.com/prongbang/gocron/cmd/gocron" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/gocron/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
