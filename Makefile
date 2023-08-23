@@ -7,4 +7,5 @@ push:
 	docker push prongbang/gocron:$(tag)
 
 push_image:
+	make push tag=latest
 	make push tag=1.0.1
