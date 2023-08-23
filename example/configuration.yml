@@ -8,8 +8,8 @@ schedulers:
         {"data": "every-24-hours"}
       header: >
         {"X-Api-Key": "XXX"}
-  - job: "every-2-minute"
-    cron: "*/2 * * * *"
+  - job: "every-1-minute"
+    cron: "*/1 * * * *"
     task:
       url: "http://localhost/post"
       method: "POST"
