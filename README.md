@@ -1,6 +1,6 @@
-# gocron
+# gocron [![Docker Pulls](https://img.shields.io/docker/pulls/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/) [![Image Size](https://img.shields.io/docker/image-size/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/)
 
-Gocron manages cron jobs with a configuration.
+[Gocron](https://hub.docker.com/r/prongbang/gocron) manages cron jobs with a configuration.
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/prongbang)
 
