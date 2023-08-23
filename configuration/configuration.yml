@@ -1,0 +1,32 @@
+env: "development"
+
+builtin: true
+
+schedulers:
+  - job: "every-24-hours"
+    cron: "0 0 * * *"
+    task:
+      url: "http://localhost/post"
+      method: "POST"
+      body: >
+        {"data": "every-24-hours"}
+      header: >
+        {"X-Api-Key": "XXX"}
+  - job: "every-2-minute"
+    cron: "*/2 * * * *"
+    task:
+      url: "http://localhost/post"
+      method: "POST"
+      body: >
+        {"data": "every-2-minute"}
+      header: >
+        {"X-Api-Key": "XXX"}
+  - job: "every-5-minute"
+    cron: "*/5 * * * *"
+    task:
+      url: "http://localhost/post"
+      method: "POST"
+      body: >
+        {"data": "every-5-minute"}
+      header: >
+        {"X-Api-Key": "XXX"}
