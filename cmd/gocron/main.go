@@ -2,23 +2,24 @@ package main
 
 import (
 	"github.com/prongbang/gocron/configuration"
+	"github.com/prongbang/gocron/internal/gocron/api"
+	"github.com/prongbang/gocron/internal/gocron/database"
 	"log"
 	"os"
 	"strconv"
 	_ "time/tzdata"
 
-	"github.com/prongbang/gocron/internal/gocron/api"
 	"github.com/prongbang/gocron/internal/gocron/builtin"
-	"github.com/prongbang/gocron/internal/gocron/database"
 )
 
 func main() {
 	source := os.Getenv("GOCRON_SOURCE")
-	buildIn, _ := strconv.ParseBool(os.Getenv("GOCRON_BUILDIN"))
+	cronBuildIn, _ := strconv.ParseBool(os.Getenv("GOCRON_BUILDIN"))
+	cronApi, _ := strconv.ParseBool(os.Getenv("GOCRON_API"))
 
 	if source == configuration.FileSource {
 		if err := configuration.Load(); err != nil {
-			log.Fatal(err)
+			log.Fatal("[ERROR]", err)
 		}
 	} else if source == configuration.RemoteSource {
 		secure, _ := strconv.ParseBool(os.Getenv("GOCRON_REMOTE_SECURE"))
@@ -29,15 +30,18 @@ func main() {
 			Path:          os.Getenv("GOCRON_REMOTE_PATH"),
 			SecretKeyring: os.Getenv("GOCRON_REMOTE_SECRET_KEYRING"),
 		}); err != nil {
-			log.Fatal(err)
+			log.Fatal("[ERROR]", err)
 		}
 	}
 
-	if buildIn {
+	if cronBuildIn {
 		builtin.New().Register()
-	} else {
-		dbDriver := database.NewDatabaseDriver()
-		apis := api.CreateAPI(dbDriver)
-		apis.Register()
+	}
+	if cronApi {
+		go func() {
+			dbDriver := database.NewDatabaseDriver()
+			apis := api.CreateAPI(dbDriver)
+			apis.Register()
+		}()
 	}
 }

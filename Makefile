@@ -8,4 +8,4 @@ push:
 
 push_image:
 	make push tag=latest
-	make push tag=1.0.1
+	make push tag=1.0.2

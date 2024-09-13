@@ -1,8 +1,8 @@
 package builtin
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/goccy/go-json"
 	"time"
 
 	"github.com/prongbang/gocron/configuration"

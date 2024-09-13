@@ -146,6 +146,7 @@ services:
     image: prongbang/gocron:latest
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_API=true
       - GOCRON_BUILDIN=true
       - GOCRON_SOURCE=file
     volumes:
