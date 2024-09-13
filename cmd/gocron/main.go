@@ -34,14 +34,14 @@ func main() {
 		}
 	}
 
-	if cronBuildIn {
-		builtin.New().Register()
-	}
 	if cronApi {
 		go func() {
 			dbDriver := database.NewDatabaseDriver()
 			apis := api.CreateAPI(dbDriver)
 			apis.Register()
 		}()
+	}
+	if cronBuildIn {
+		builtin.New().Register()
 	}
 }
