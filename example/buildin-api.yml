@@ -4,6 +4,7 @@ services:
     container_name: gocron_buildin
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_API=true
       - GOCRON_BUILDIN=true
       - GOCRON_SOURCE=file
     volumes:
