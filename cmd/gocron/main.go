@@ -5,6 +5,7 @@ import (
 	"github.com/prongbang/gocron/internal/gocron/api"
 	"github.com/prongbang/gocron/internal/gocron/database"
 	"log"
+	"log/slog"
 	"os"
 	"strconv"
 	_ "time/tzdata"
@@ -14,8 +15,11 @@ import (
 
 func main() {
 	source := os.Getenv("GOCRON_SOURCE")
-	cronBuildIn, _ := strconv.ParseBool(os.Getenv("GOCRON_BUILDIN"))
-	cronApi, _ := strconv.ParseBool(os.Getenv("GOCRON_API"))
+	cronBuildIn, err1 := strconv.ParseBool(os.Getenv("GOCRON_BUILDIN"))
+	cronApi, err2 := strconv.ParseBool(os.Getenv("GOCRON_API"))
+
+	slog.Error("Parse GOCRON_BUILDIN", "error", err1)
+	slog.Error("Parse GOCRON_API", "error", err2)
 
 	if source == configuration.FileSource {
 		if err := configuration.Load(); err != nil {
@@ -34,13 +38,22 @@ func main() {
 		}
 	}
 
-	if cronApi {
-		go func() {
-			dbDriver := database.NewDatabaseDriver()
-			apis := api.CreateAPI(dbDriver)
-			apis.Register()
-		}()
+	cronApiFun := func() {
+		dbDriver := database.NewDatabaseDriver()
+		apis := api.CreateAPI(dbDriver)
+		apis.Register()
 	}
+
+	// Run cronApiFun based on the cronApi and cronBuildIn flags
+	if cronApi {
+		if cronBuildIn {
+			go cronApiFun()
+		} else {
+			cronApiFun()
+		}
+	}
+
+	// Register builtin if cronBuildIn is enabled
 	if cronBuildIn {
 		builtin.New().Register()
 	}
