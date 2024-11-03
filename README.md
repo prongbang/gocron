@@ -16,6 +16,7 @@ services:
       - "8000:8000"
     environment:
       - TZ=Asia/Bangkok
+      - GOCRON_API=true
 ```
 
 ### Create
