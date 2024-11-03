@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gocron-deployment
+spec:
+  selector:
+    matchLabels:
+      app: gocron
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: gocron
+    spec:
+      containers:
+        - name: gocron
+          image: prongbang/gocron:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
