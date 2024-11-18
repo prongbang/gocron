@@ -4,6 +4,29 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/prongbang)
 
+## Install by Source
+
+```shell
+go get github.com/prongbang/gocron
+```
+
+Using
+
+```go
+package main
+
+import (
+	"github.com/prongbang/gocron/cmd/gocron/runner"
+	_ "time/tzdata"
+)
+
+func main() {
+	runner.Start()
+}
+```
+
+## Install by Docker
+
 ## Configuration with API
 
 - docker-compose.yml
