@@ -1,3 +1,11 @@
+# web stage: build the dashboard that gets embedded into the binary
+FROM oven/bun:1-alpine AS web
+WORKDIR /web
+COPY web/package.json web/bun.lockb ./
+RUN bun install --frozen-lockfile
+COPY web/ .
+RUN bun run build
+
 # build stage
 FROM golang:alpine AS builder
 
@@ -9,6 +17,7 @@ RUN apk update && apk add --no-cache git
 RUN mkdir -p /go/src/github.com/prongbang/gocron
 WORKDIR /go/src/github.com/prongbang/gocron
 COPY . .
+COPY --from=web /web/build web/build
 
 # Using go mod with go 1.11
 RUN go mod vendor

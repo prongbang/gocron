@@ -13,7 +13,7 @@
 	import CreateJobDialog from '$lib/components/create-job-dialog.svelte';
 	import JobTable from '$lib/components/job-table.svelte';
 	import { cn } from '$lib/utils';
-	import { API_URL, listJobs, stopJob, type Job } from '$lib/api';
+	import { listJobs, stopJob, type Job } from '$lib/api';
 
 	let jobs = $state<Job[]>([]);
 	let loading = $state(true);
@@ -64,8 +64,7 @@
 		<div class="flex flex-col gap-1">
 			<h1 class="text-2xl font-semibold tracking-tight">Jobs</h1>
 			<p class="text-muted-foreground text-sm">
-				{jobs.length} jobs · {projects.length} projects ·
-				<code class="font-mono">{API_URL}</code>
+				{jobs.length} jobs · {projects.length} projects
 			</p>
 		</div>
 		<div class="flex gap-2">

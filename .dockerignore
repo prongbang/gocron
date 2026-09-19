@@ -8,3 +8,6 @@ tmp
 .idea
 deployments
 example
+web/node_modules
+web/.svelte-kit
+web/build

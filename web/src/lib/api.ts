@@ -1,7 +1,3 @@
-import { env } from '$env/dynamic/public';
-
-export const API_URL = (env.PUBLIC_GOCRON_API || 'http://localhost:8000').replace(/\/$/, '');
-
 export type Job = {
 	job: string;
 	project?: string;
@@ -17,7 +13,7 @@ export type Job = {
 export type NewJob = Omit<Job, 'job' | 'running' | 'next_run'>;
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
-	const res = await fetch(API_URL + path, {
+	const res = await fetch(path, {
 		...init,
 		headers: { 'Content-Type': 'application/json' }
 	});

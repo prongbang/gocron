@@ -44,6 +44,12 @@ services:
       - GOCRON_API=true
 ```
 
+### Web dashboard
+
+With `GOCRON_API=true`, open [http://localhost:8000](http://localhost:8000) to manage jobs and browse run history. The dashboard is embedded in the binary and the Docker image.
+
+Building from source? Run `make build` (needs [bun](https://bun.sh)) so the dashboard is embedded; a plain `go build` still works but serves the API only.
+
 ### Create
 
 - `POST http://localhost:8000/v1/scheduler`

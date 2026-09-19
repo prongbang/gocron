@@ -1,3 +1,8 @@
+# Build the dashboard, then the binary that embeds it.
+build:
+	cd web && bun install && bun run build
+	go build -o bin/gocron ./cmd/gocron
+
 login:
 	docker login
 
