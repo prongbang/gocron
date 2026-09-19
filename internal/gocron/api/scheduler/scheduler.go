@@ -1,5 +1,7 @@
 package scheduler
 
+import "time"
+
 const (
 	TaskApi    = "api"
 	TaskGrpc   = "grpc"
@@ -21,6 +23,7 @@ type CreateScheduler struct {
 	Cron    string              `json:"cron"`
 	Task    CreateSchedulerTask `json:"task"`
 	Running bool                `json:"running"`
+	NextRun *time.Time          `json:"next_run,omitempty"`
 }
 
 type CreateSchedulerConfig struct {

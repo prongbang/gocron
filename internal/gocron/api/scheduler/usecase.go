@@ -29,6 +29,9 @@ func (u *useCase) GetAll() []CreateScheduler {
 			if c.Job == k {
 				// Update status running
 				c.Running = v.IsRunning()
+				if _, next := v.NextRun(); !next.IsZero() {
+					c.NextRun = &next
+				}
 
 				data = append(data, c)
 			}

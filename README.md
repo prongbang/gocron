@@ -108,7 +108,8 @@ Response
                     }
                 }
             },
-            "running": true
+            "running": true,
+            "next_run": "2026-09-19T09:41:00+07:00"
         }
     ]
 }
