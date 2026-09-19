@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/prongbang/callx v1.3.2
 	github.com/spf13/viper v1.19.0
+	golang.org/x/crypto v0.31.0
 )
 
 require (
