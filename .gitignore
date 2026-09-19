@@ -69,3 +69,5 @@ fabric.properties
 
 # Binary
 bin/
+
+.claude/launch.json
