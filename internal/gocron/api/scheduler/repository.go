@@ -9,6 +9,10 @@ import (
 	"github.com/prongbang/gocron/internal/gocron/database"
 )
 
+// Job keys are bare UUIDs; every other record in the shared badger DB is namespaced
+// as "<kind>:…" (history:, user:, session:), so anything with a colon is not a job.
+func isJobKey(k []byte) bool { return !bytes.Contains(k, []byte(":")) }
+
 type Repository interface {
 	GetConfigAll() []CreateScheduler
 	Add(key string, data CreateScheduler) error
@@ -34,7 +38,7 @@ func (r *repository) GetConfigAll() []CreateScheduler {
 
 		for itr.Rewind(); itr.Valid(); itr.Next() {
 			item := itr.Item()
-			if bytes.HasPrefix(item.Key(), historyPrefix) {
+			if !isJobKey(item.Key()) {
 				continue
 			}
 			fn := func(v []byte) error {
