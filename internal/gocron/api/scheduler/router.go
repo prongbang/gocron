@@ -20,6 +20,7 @@ func (r *router) Initial(app *fiber.App) {
 		v1.Get("/scheduler", r.Handle.GetList)
 		v1.Post("/scheduler", r.Handle.Create)
 		v1.Post("/scheduler/stop", r.Handle.StopByJob)
+		v1.Get("/history", r.Handle.GetHistory)
 	}
 }
 

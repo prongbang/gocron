@@ -6,8 +6,8 @@ import (
 )
 
 func CreateAPI(dbDriver database.Drivers) API {
-	schedulerTask := scheduler.NewTask()
 	schedulerRepo := scheduler.NewRepository(dbDriver)
+	schedulerTask := scheduler.NewTask(schedulerRepo)
 	schedulerUseCase := scheduler.NewUseCase(schedulerRepo, schedulerTask)
 	schedulerHandler := scheduler.NewHandler(schedulerUseCase)
 	schedulerRouter := scheduler.NewRouter(schedulerHandler)

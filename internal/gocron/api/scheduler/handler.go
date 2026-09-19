@@ -14,6 +14,7 @@ type Handler interface {
 	GetList(c *fiber.Ctx) error
 	Create(c *fiber.Ctx) error
 	StopByJob(c *fiber.Ctx) error
+	GetHistory(c *fiber.Ctx) error
 }
 
 type handler struct {
@@ -84,6 +85,14 @@ func (h *handler) StopByJob(c *fiber.Ctx) error {
 	cr.Stop()
 
 	return core.Ok(c, Scheduler{Job: s.Job})
+}
+
+func (h *handler) GetHistory(c *fiber.Ctx) error {
+	limit := c.QueryInt("limit", 500)
+	if limit < 1 || limit > 1000 {
+		return core.BadRequest(c, "limit must be between 1 and 1000")
+	}
+	return core.Ok(c, h.Uc.GetHistory(c.Query("job"), limit))
 }
 
 func NewHandler(uc UseCase) Handler {

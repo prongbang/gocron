@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -12,6 +13,8 @@ type Repository interface {
 	GetConfigAll() []CreateScheduler
 	Add(key string, data CreateScheduler) error
 	Delete(key string) error
+	AddHistory(h History) error
+	GetHistory(job string, limit int) []History
 }
 
 type repository struct {
@@ -31,6 +34,9 @@ func (r *repository) GetConfigAll() []CreateScheduler {
 
 		for itr.Rewind(); itr.Valid(); itr.Next() {
 			item := itr.Item()
+			if bytes.HasPrefix(item.Key(), historyPrefix) {
+				continue
+			}
 			fn := func(v []byte) error {
 				s := CreateScheduler{}
 				if err := json.Unmarshal(v, &s); err == nil {

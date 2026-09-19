@@ -19,7 +19,7 @@ type buildIn struct {
 
 func (b *buildIn) Register() {
 	cr := cron.New()
-	ts := scheduler.NewTask()
+	ts := scheduler.NewTask(nil) // builtin mode has no database, so no history
 
 	config := configuration.Config
 	for _, s := range config.Schedulers {

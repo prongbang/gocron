@@ -139,6 +139,36 @@ Response
 }
 ```
 
+### History
+
+Every run of an API-created job is recorded and kept for 7 days (not recorded in BuildIn mode).
+
+- `GET http://localhost:8000/v1/history?job=83ba2dc9dd5c4326a07dc9eb2d5163b3&limit=500`
+
+`job` is optional, `limit` defaults to 500 (max 1000). Newest first.
+
+Response
+
+```json
+{
+    "code": "200",
+    "message": "OK",
+    "data": [
+        {
+            "job": "83ba2dc9dd5c4326a07dc9eb2d5163b3",
+            "project": "billing",
+            "cron": "*/1 * * * *",
+            "method": "POST",
+            "url": "http://localhost/notify",
+            "status": 200,
+            "response": "{\"ok\":true}",
+            "started_at": "2026-09-19T09:49:00.0012+07:00",
+            "duration_ms": 12
+        }
+    ]
+}
+```
+
 ## Configuration with BuildIn
 
 ```yml
