@@ -53,5 +53,13 @@ export type History = {
 	duration_ms: number;
 };
 
-export const listHistory = async (job = '', limit = 500) =>
-	(await call<History[] | null>(`/v1/history?${new URLSearchParams({ job, limit: String(limit) })}`)) ?? [];
+export type HistoryFilter = { job: string; project: string; status: string; q: string; page: number };
+export type HistoryPage = { items: History[]; total: number; projects: string[] };
+
+export const HISTORY_PER_PAGE = 20;
+
+export function listHistory(f: HistoryFilter) {
+	const params = new URLSearchParams({ page: String(f.page), limit: String(HISTORY_PER_PAGE) });
+	for (const k of ['job', 'project', 'status', 'q'] as const) if (f[k]) params.set(k, f[k]);
+	return call<HistoryPage>(`/v1/history?${params}`);
+}

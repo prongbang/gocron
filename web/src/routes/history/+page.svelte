@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page as appPage } from '$app/state';
 	import * as Card from '$lib/components/ui/card';
 	import * as Table from '$lib/components/ui/table';
 	import * as Empty from '$lib/components/ui/empty';
 	import * as Alert from '$lib/components/ui/alert';
+	import * as Select from '$lib/components/ui/select';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
@@ -15,55 +18,85 @@
 	import Pager from '$lib/components/pager.svelte';
 	import { cn } from '$lib/utils';
 	import { fromNow } from '$lib/cron';
-	import { listHistory, type History } from '$lib/api';
+	import { HISTORY_PER_PAGE, listHistory, type History, type HistoryFilter } from '$lib/api';
 
-	const PER_PAGE = 20;
 	const ok = (h: History) => h.status >= 200 && h.status < 300;
 
-	const job = $derived(appPage.url.searchParams.get('job') ?? '');
-	let runs = $state<History[]>([]);
+	// Filters live in the URL so a filtered view can be shared or bookmarked.
+	const filter: HistoryFilter = $derived.by(() => {
+		const p = appPage.url.searchParams;
+		return {
+			job: p.get('job') ?? '',
+			project: p.get('project') ?? '',
+			status: p.get('status') ?? '',
+			q: p.get('q') ?? '',
+			page: Math.max(1, Number(p.get('page')) || 1)
+		};
+	});
+	const filtered = $derived(!!(filter.job || filter.project || filter.status || filter.q));
+
+	/** Update URL params; empty values are dropped and any filter change goes back to page 1. */
+	function set(patch: Partial<Record<keyof HistoryFilter, string | number>>) {
+		const p = new URLSearchParams(appPage.url.searchParams);
+		if (!('page' in patch)) p.delete('page');
+		for (const [k, v] of Object.entries(patch)) {
+			if (v && !(k === 'page' && v === 1)) p.set(k, String(v));
+			else p.delete(k);
+		}
+		goto(`?${p}`, { replaceState: true, keepFocus: true, noScroll: true });
+	}
+
+	let items = $state<History[]>([]);
+	let total = $state(0);
+	let projects = $state<string[]>([]);
 	let loading = $state(true);
 	let error = $state('');
-	let status = $state<'all' | 'ok' | 'failed'>('all');
-	let page = $state(1);
+	let loaded = $state(false); // Pager must not clamp ?page= against total=0 before the first response
+	let seq = 0;
 
-	const filtered = $derived(
-		status === 'all' ? runs : runs.filter((h) => (status === 'ok') === ok(h))
-	);
-	const rows = $derived(filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE));
-	const failed = $derived(runs.filter((h) => !ok(h)).length);
-
-	async function load(silent = false) {
+	async function load(f: HistoryFilter, silent = false) {
+		const mine = ++seq;
 		if (!silent) loading = true;
 		try {
-			runs = await listHistory(job);
+			const res = await listHistory(f);
+			if (mine !== seq) return; // a newer filter's response wins
+			({ items, total, projects } = res);
 			error = '';
+			loaded = true;
 		} catch (err) {
-			error = (err as Error).message;
+			if (mine === seq) error = (err as Error).message;
 		} finally {
-			loading = false;
+			if (mine === seq) loading = false;
 		}
 	}
 
-	// Reload whenever the ?job= filter changes, and every 30s in the background.
 	$effect(() => {
-		job;
-		page = 1;
-		load();
-		const id = setInterval(() => load(true), 30_000);
+		const f = filter;
+		load(f);
+		const id = setInterval(() => load(f, true), 30_000);
 		return () => clearInterval(id);
 	});
+
+	// Search box: keep typing snappy, push to the URL after a short pause.
+	let search = $state('');
+	const urlQ = $derived(filter.q);
+	$effect(() => {
+		search = urlQ;
+	});
+	let timer: ReturnType<typeof setTimeout>;
+	function onsearch() {
+		clearTimeout(timer);
+		timer = setTimeout(() => set({ q: search.trim() }), 300);
+	}
 </script>
 
 <main class="mx-auto flex max-w-6xl flex-col gap-6 p-4 sm:p-8">
 	<header class="flex flex-wrap items-center justify-between gap-4">
 		<div class="flex flex-col gap-1">
 			<h1 class="text-2xl font-semibold tracking-tight">History</h1>
-			<p class="text-muted-foreground text-sm">
-				{runs.length} runs · {failed} failed · kept for 7 days
-			</p>
+			<p class="text-muted-foreground text-sm">Every job run, kept for 7 days</p>
 		</div>
-		<Button variant="outline" onclick={() => load()} disabled={loading}>
+		<Button variant="outline" onclick={() => load(filter)} disabled={loading}>
 			<RefreshCwIcon data-icon="inline-start" class={cn(loading && 'animate-spin')} />
 			Refresh
 		</Button>
@@ -81,64 +114,94 @@
 		<Card.Header>
 			<Card.Title>Runs</Card.Title>
 			<Card.Description>
-				{#if job}
-					Job <code class="font-mono">{job.slice(0, 8)}</code>
-				{:else}
-					All jobs, newest first
-				{/if}
+				{total} {filtered ? 'matching' : ''} runs · newest first
+				{#if filter.job}· job <code class="font-mono">{filter.job.slice(0, 8)}</code>{/if}
 			</Card.Description>
-			<Card.Action class="flex items-center gap-2">
-				{#if job}
-					<a href="/history" class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+			{#if filtered}
+				<Card.Action>
+					<Button variant="ghost" size="sm" onclick={() => goto('/history', { noScroll: true })}>
 						<XIcon data-icon="inline-start" />
-						All jobs
-					</a>
-				{/if}
+						Clear filters
+					</Button>
+				</Card.Action>
+			{/if}
+		</Card.Header>
+		<Card.Content class="flex flex-col gap-4">
+			<div class="flex flex-wrap items-center gap-2">
+				<Input
+					type="search"
+					class="min-w-48 flex-1"
+					placeholder="Search URL, job, status, response…"
+					aria-label="Search history"
+					bind:value={search}
+					oninput={onsearch}
+				/>
+				<Select.Root
+					type="single"
+					value={filter.project || 'all'}
+					onValueChange={(v) => set({ project: v === 'all' ? '' : v })}
+				>
+					<Select.Trigger class="w-44" aria-label="Project">
+						{filter.project || 'All projects'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							<Select.Item value="all">All projects</Select.Item>
+							{#each projects as p (p)}
+								<Select.Item value={p}>{p}</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
 				<ToggleGroup.Root
 					type="single"
 					variant="outline"
-					size="sm"
-					bind:value={
-						() => status,
-						(v) => {
-							if (v) status = v as typeof status;
-							page = 1;
-						}
-					}
+					value={filter.status || 'all'}
+					onValueChange={(v) => v && set({ status: v === 'all' ? '' : v })}
 				>
 					<ToggleGroup.Item value="all">All</ToggleGroup.Item>
 					<ToggleGroup.Item value="ok">Success</ToggleGroup.Item>
 					<ToggleGroup.Item value="failed">Failed</ToggleGroup.Item>
 				</ToggleGroup.Root>
-			</Card.Action>
-		</Card.Header>
-		<Card.Content class="flex flex-col gap-4">
-			{#if loading && !runs.length}
+			</div>
+
+			{#if loading && !items.length}
 				{#each [1, 2, 3] as i (i)}<Skeleton class="h-10 w-full" />{/each}
-			{:else if !filtered.length}
+			{:else if !items.length}
 				<Empty.Root>
 					<Empty.Header>
 						<Empty.Media variant="icon"><HistoryIcon /></Empty.Media>
-						<Empty.Title>{runs.length ? 'No matching runs' : 'No runs yet'}</Empty.Title>
-						<Empty.Description>Runs appear here each time a job fires.</Empty.Description>
+						<Empty.Title>{filtered ? 'No matching runs' : 'No runs yet'}</Empty.Title>
+						<Empty.Description>
+							{filtered ? 'Try a different search or filter.' : 'Runs appear here each time a job fires.'}
+						</Empty.Description>
 					</Empty.Header>
 				</Empty.Root>
 			{:else}
 				<Table.Root>
 					<Table.Header>
 						<Table.Row>
+							<Table.Head>Project</Table.Head>
 							<Table.Head>Time</Table.Head>
 							<Table.Head>Status</Table.Head>
 							<Table.Head>Request</Table.Head>
-							<Table.Head>Project</Table.Head>
 							<Table.Head>Job</Table.Head>
 							<Table.Head class="text-right">Duration</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each rows as h (h.started_at + h.job)}
+						{#each items as h (h.started_at + h.job)}
 							{@const at = new Date(h.started_at)}
 							<Table.Row>
+								<Table.Cell>
+									{#if h.project}
+										<button class="hover:underline" onclick={() => set({ project: h.project })}>
+											{h.project}
+										</button>
+									{:else}
+										<span class="text-muted-foreground">—</span>
+									{/if}
+								</Table.Cell>
 								<Table.Cell>
 									<div class="flex flex-col">
 										<span>{fromNow(at)}</span>
@@ -163,18 +226,29 @@
 										<span class="truncate" title={h.url}>{h.url}</span>
 									</div>
 								</Table.Cell>
-								<Table.Cell>{h.project || '—'}</Table.Cell>
 								<Table.Cell class="font-mono text-xs">
-									<a href="/history?job={h.job}" class="text-muted-foreground hover:underline" title={h.job}>
+									<button
+										class="text-muted-foreground hover:underline"
+										title={h.job}
+										onclick={() => set({ job: h.job })}
+									>
 										{h.job.slice(0, 8)}
-									</a>
+									</button>
 								</Table.Cell>
 								<Table.Cell class="text-right tabular-nums">{h.duration_ms} ms</Table.Cell>
 							</Table.Row>
 						{/each}
 					</Table.Body>
 				</Table.Root>
-				<Pager count={filtered.length} perPage={PER_PAGE} bind:page />
+			{/if}
+
+			<!-- Mounted even when the page is empty so an out-of-range ?page= gets clamped. -->
+			{#if loaded}
+				<Pager
+					count={total}
+					perPage={HISTORY_PER_PAGE}
+					bind:page={() => filter.page, (v) => set({ page: v })}
+				/>
 			{/if}
 		</Card.Content>
 	</Card.Root>
