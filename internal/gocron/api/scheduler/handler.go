@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/prongbang/gocron/internal/pkg/common"
@@ -88,11 +89,23 @@ func (h *handler) StopByJob(c *fiber.Ctx) error {
 }
 
 func (h *handler) GetHistory(c *fiber.Ctx) error {
-	limit := c.QueryInt("limit", 500)
-	if limit < 1 || limit > 1000 {
-		return core.BadRequest(c, "limit must be between 1 and 1000")
+	q := HistoryQuery{
+		Job:     c.Query("job"),
+		Project: c.Query("project"),
+		Status:  c.Query("status"),
+		Q:       strings.TrimSpace(c.Query("q")),
+		Page:    c.QueryInt("page", 1),
+		Limit:   c.QueryInt("limit", 20),
 	}
-	return core.Ok(c, h.Uc.GetHistory(c.Query("job"), limit))
+	switch {
+	case q.Page < 1:
+		return core.BadRequest(c, "page must be >= 1")
+	case q.Limit < 1 || q.Limit > 100:
+		return core.BadRequest(c, "limit must be between 1 and 100")
+	case q.Status != "" && q.Status != "ok" && q.Status != "failed":
+		return core.BadRequest(c, "status must be ok or failed")
+	}
+	return core.Ok(c, h.Uc.GetHistory(q))
 }
 
 func NewHandler(uc UseCase) Handler {

@@ -14,7 +14,7 @@ type Repository interface {
 	Add(key string, data CreateScheduler) error
 	Delete(key string) error
 	AddHistory(h History) error
-	GetHistory(job string, limit int) []History
+	GetHistory(q HistoryQuery) HistoryPage
 }
 
 type repository struct {

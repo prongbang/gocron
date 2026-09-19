@@ -143,29 +143,40 @@ Response
 
 Every run of an API-created job is recorded and kept for 7 days (not recorded in BuildIn mode).
 
-- `GET http://localhost:8000/v1/history?job=83ba2dc9dd5c4326a07dc9eb2d5163b3&limit=500`
+- `GET http://localhost:8000/v1/history?project=billing&status=failed&q=timeout&page=1&limit=20`
 
-`job` is optional, `limit` defaults to 500 (max 1000). Newest first.
+| Param | Description |
+|---|---|
+| `job` | Only runs of this job id |
+| `project` | Only runs of this project |
+| `status` | `ok` (2xx) or `failed` (anything else) |
+| `q` | Case-insensitive search in job, project, method, url, status and response |
+| `page` | 1-based, default `1` |
+| `limit` | 1-100, default `20` |
 
-Response
+Response (newest first; `projects` lists every project in history, for filters)
 
 ```json
 {
     "code": "200",
     "message": "OK",
-    "data": [
-        {
-            "job": "83ba2dc9dd5c4326a07dc9eb2d5163b3",
-            "project": "billing",
-            "cron": "*/1 * * * *",
-            "method": "POST",
-            "url": "http://localhost/notify",
-            "status": 200,
-            "response": "{\"ok\":true}",
-            "started_at": "2026-09-19T09:49:00.0012+07:00",
-            "duration_ms": 12
-        }
-    ]
+    "data": {
+        "items": [
+            {
+                "job": "83ba2dc9dd5c4326a07dc9eb2d5163b3",
+                "project": "billing",
+                "cron": "*/1 * * * *",
+                "method": "POST",
+                "url": "http://localhost/notify",
+                "status": 504,
+                "response": "gateway timeout",
+                "started_at": "2026-09-19T09:49:00.0012+07:00",
+                "duration_ms": 60000
+            }
+        ],
+        "total": 1,
+        "projects": ["billing", "reports"]
+    }
 }
 ```
 

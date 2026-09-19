@@ -3,6 +3,9 @@ package scheduler
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/badger/v3"
@@ -42,9 +45,43 @@ func (r *repository) AddHistory(h History) error {
 	})
 }
 
-// GetHistory returns up to limit records, newest first, optionally for one job.
-func (r *repository) GetHistory(job string, limit int) []History {
-	data := []History{}
+type HistoryQuery struct {
+	Job     string
+	Project string
+	Status  string // "", "ok" or "failed"
+	Q       string // case-insensitive substring of job, project, method, url, status or response
+	Page    int    // 1-based
+	Limit   int
+}
+
+type HistoryPage struct {
+	Items    []History `json:"items"`
+	Total    int       `json:"total"`
+	Projects []string  `json:"projects"` // every project seen in history, for the filter
+}
+
+func (q HistoryQuery) match(h History) bool {
+	ok := h.Status >= 200 && h.Status < 300
+	switch {
+	case q.Job != "" && h.Job != q.Job,
+		q.Project != "" && h.Project != q.Project,
+		q.Status == "ok" && !ok,
+		q.Status == "failed" && ok:
+		return false
+	}
+	if q.Q == "" {
+		return true
+	}
+	text := strings.ToLower(strings.Join([]string{h.Job, h.Project, h.Method, h.URL, strconv.Itoa(h.Status), h.Response}, " "))
+	return strings.Contains(text, strings.ToLower(q.Q))
+}
+
+// GetHistory returns one page of matching records, newest first.
+// ponytail: full scan per request (fine for 7 days of history), add secondary indexes if it gets slow.
+func (r *repository) GetHistory(q HistoryQuery) HistoryPage {
+	res := HistoryPage{Items: []History{}, Projects: []string{}}
+	skip := (q.Page - 1) * q.Limit
+	projects := map[string]bool{}
 	err := r.Drivers.BadgerDB().View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		opts.Reverse = true
@@ -52,11 +89,20 @@ func (r *repository) GetHistory(job string, limit int) []History {
 		itr := txn.NewIterator(opts)
 		defer itr.Close()
 
-		for itr.Seek(append(historyPrefix, 0xff)); itr.ValidForPrefix(historyPrefix) && len(data) < limit; itr.Next() {
+		for itr.Seek([]byte(string(historyPrefix) + "\xff")); itr.ValidForPrefix(historyPrefix); itr.Next() {
 			_ = itr.Item().Value(func(v []byte) error {
 				h := History{}
-				if json.Unmarshal(v, &h) == nil && (job == "" || h.Job == job) {
-					data = append(data, h)
+				if json.Unmarshal(v, &h) != nil {
+					return nil
+				}
+				if h.Project != "" {
+					projects[h.Project] = true
+				}
+				if q.match(h) {
+					if res.Total >= skip && len(res.Items) < q.Limit {
+						res.Items = append(res.Items, h)
+					}
+					res.Total++
 				}
 				return nil
 			})
@@ -66,5 +112,9 @@ func (r *repository) GetHistory(job string, limit int) []History {
 	if err != nil {
 		fmt.Println("[ERROR]", err)
 	}
-	return data
+	for p := range projects {
+		res.Projects = append(res.Projects, p)
+	}
+	sort.Strings(res.Projects)
+	return res
 }

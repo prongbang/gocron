@@ -11,7 +11,7 @@ type UseCase interface {
 	CreateOnServiceStart() []StatusScheduler
 	Create(job string, data CreateScheduler) (string, error)
 	Delete(key string) error
-	GetHistory(job string, limit int) []History
+	GetHistory(q HistoryQuery) HistoryPage
 }
 
 type useCase struct {
@@ -103,8 +103,8 @@ func (u *useCase) Delete(key string) error {
 	return nil
 }
 
-func (u *useCase) GetHistory(job string, limit int) []History {
-	return u.Repo.GetHistory(job, limit)
+func (u *useCase) GetHistory(q HistoryQuery) HistoryPage {
+	return u.Repo.GetHistory(q)
 }
 
 func NewUseCase(repo Repository, task Task) UseCase {
