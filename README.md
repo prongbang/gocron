@@ -50,6 +50,7 @@ Request
 
 ```json
 {
+    "project": "billing",
     "cron": "*/1 * * * *",
     "task": {
         "type": "api",
@@ -92,6 +93,7 @@ Response
     "data": [
         {
             "job": "83ba2dc9dd5c4326a07dc9eb2d5163b3",
+            "project": "billing",
             "cron": "*/1 * * * *",
             "task": {
                 "type": "api",

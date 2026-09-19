@@ -17,6 +17,7 @@ type StatusScheduler struct {
 
 type CreateScheduler struct {
 	Job     string              `json:"job"`
+	Project string              `json:"project"`
 	Cron    string              `json:"cron"`
 	Task    CreateSchedulerTask `json:"task"`
 	Running bool                `json:"running"`
