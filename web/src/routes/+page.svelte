@@ -13,6 +13,7 @@
 	import CreateJobDialog from '$lib/components/create-job-dialog.svelte';
 	import JobTable from '$lib/components/job-table.svelte';
 	import { cn } from '$lib/utils';
+	import { canWriteJobs } from '$lib/session.svelte';
 	import { listJobs, stopJob, type Job } from '$lib/api';
 
 	let jobs = $state<Job[]>([]);
@@ -72,7 +73,7 @@
 				<RefreshCwIcon data-icon="inline-start" class={cn(loading && 'animate-spin')} />
 				Refresh
 			</Button>
-			<CreateJobDialog {projects} oncreated={load} />
+			{#if canWriteJobs()}<CreateJobDialog {projects} oncreated={load} />{/if}
 		</div>
 	</header>
 

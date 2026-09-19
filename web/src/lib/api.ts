@@ -19,6 +19,11 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 	});
 	// fiber.ErrBadRequest replies with plain text, core.* replies with JSON
 	const text = await res.text();
+	// Signed out or session expired: send the user to the login page and come back afterwards.
+	if (res.status === 401 && !path.startsWith('/v1/auth/')) {
+		location.href = `/login?next=${encodeURIComponent(location.pathname + location.search)}`;
+		throw new Error('Signed out');
+	}
 	let json: { message?: string; data?: T } = {};
 	try {
 		json = JSON.parse(text);
@@ -59,3 +64,22 @@ export function listHistory(f: HistoryFilter) {
 	for (const k of ['job', 'project', 'status', 'q'] as const) if (f[k]) params.set(k, f[k]);
 	return call<HistoryPage>(`/v1/history?${params}`);
 }
+
+export type Me =
+	| { auth: false }
+	| {
+			auth: true;
+			username: string;
+			role: string;
+			can: { write_jobs: boolean; manage_users: boolean };
+	  };
+
+export const getMe = () => call<Me>('/v1/auth/me');
+
+export const login = (username: string, password: string) =>
+	call<{ token: string }>('/v1/auth/login', {
+		method: 'POST',
+		body: JSON.stringify({ username, password })
+	});
+
+export const logout = () => call<null>('/v1/auth/logout', { method: 'POST' });

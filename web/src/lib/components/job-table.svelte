@@ -8,6 +8,7 @@
 	import HistoryIcon from '@lucide/svelte/icons/history';
 	import type { Job } from '$lib/api';
 	import { describeCron, fromNow, serverZone } from '$lib/cron';
+	import { canWriteJobs } from '$lib/session.svelte';
 
 	let { jobs, onstop }: { jobs: Job[]; onstop: (job: string) => void } = $props();
 
@@ -72,28 +73,30 @@
 							<HistoryIcon data-icon="inline-start" />
 							History
 						</a>
-						<AlertDialog.Root>
-							<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-								<CircleStopIcon data-icon="inline-start" />
-								Stop
-							</AlertDialog.Trigger>
-							<AlertDialog.Content>
-								<AlertDialog.Header>
-									<AlertDialog.Title>Stop this job?</AlertDialog.Title>
-									<AlertDialog.Description>
-										<code class="font-mono">{j.cron}</code>
-										{j.task.config.method}
-										{j.task.config.url} will be stopped and removed. This cannot be undone.
-									</AlertDialog.Description>
-								</AlertDialog.Header>
-								<AlertDialog.Footer>
-									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-									<AlertDialog.Action variant="destructive" onclick={() => onstop(j.job)}>
-										Stop job
-									</AlertDialog.Action>
-								</AlertDialog.Footer>
-							</AlertDialog.Content>
-						</AlertDialog.Root>
+						{#if canWriteJobs()}
+							<AlertDialog.Root>
+								<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+									<CircleStopIcon data-icon="inline-start" />
+									Stop
+								</AlertDialog.Trigger>
+								<AlertDialog.Content>
+									<AlertDialog.Header>
+										<AlertDialog.Title>Stop this job?</AlertDialog.Title>
+										<AlertDialog.Description>
+											<code class="font-mono">{j.cron}</code>
+											{j.task.config.method}
+											{j.task.config.url} will be stopped and removed. This cannot be undone.
+										</AlertDialog.Description>
+									</AlertDialog.Header>
+									<AlertDialog.Footer>
+										<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+										<AlertDialog.Action variant="destructive" onclick={() => onstop(j.job)}>
+											Stop job
+										</AlertDialog.Action>
+									</AlertDialog.Footer>
+								</AlertDialog.Content>
+							</AlertDialog.Root>
+						{/if}
 					</Table.Cell>
 				</Table.Row>
 			{/each}
