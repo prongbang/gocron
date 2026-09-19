@@ -1,4 +1,4 @@
-# gocron [![Docker Pulls](https://img.shields.io/docker/pulls/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/) [![Image Size](https://img.shields.io/docker/image-size/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/)
+# <img src="web/src/lib/assets/logo.svg" height="32" alt=""> gocron [![Docker Pulls](https://img.shields.io/docker/pulls/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/) [![Image Size](https://img.shields.io/docker/image-size/prongbang/gocron.svg)](https://hub.docker.com/r/prongbang/gocron/)
 
 [Gocron](https://hub.docker.com/r/prongbang/gocron) manages cron jobs with a configuration.
 
