@@ -37,9 +37,9 @@
 				<Table.Row>
 					<Table.Cell>
 						<div class="flex flex-col">
-							<span>{describeCron(j.cron).text}</span>
+							<code class="font-mono">{j.cron}</code>
 							<span class="text-muted-foreground text-xs">
-								<code class="font-mono">{j.cron}</code>
+								{describeCron(j.cron).text}
 								{#if j.next_run}· server {serverZone(j.next_run)}{/if}
 							</span>
 						</div>
