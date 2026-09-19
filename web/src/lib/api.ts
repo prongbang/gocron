@@ -83,3 +83,21 @@ export const login = (username: string, password: string) =>
 	});
 
 export const logout = () => call<null>('/v1/auth/logout', { method: 'POST' });
+
+export const ROLES = ['admin', 'editor', 'viewer'] as const;
+
+export type User = { username: string; role: string; created_at: string };
+
+export const listUsers = async () => (await call<User[] | null>('/v1/users')) ?? [];
+
+export const createUser = (u: { username: string; password: string; role: string }) =>
+	call<User>('/v1/users', { method: 'POST', body: JSON.stringify(u) });
+
+export const updateUser = (username: string, patch: { role?: string; password?: string }) =>
+	call<User>(`/v1/users/${encodeURIComponent(username)}`, {
+		method: 'PUT',
+		body: JSON.stringify(patch)
+	});
+
+export const deleteUser = (username: string) =>
+	call<null>(`/v1/users/${encodeURIComponent(username)}`, { method: 'DELETE' });
