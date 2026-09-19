@@ -6,7 +6,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import CircleStopIcon from '@lucide/svelte/icons/circle-stop';
 	import type { Job } from '$lib/api';
-	import { describeCron } from '$lib/cron';
+	import { describeCron, fromNow, serverZone } from '$lib/cron';
 
 	let { jobs, onstop }: { jobs: Job[]; onstop: (job: string) => void } = $props();
 
@@ -25,6 +25,7 @@
 		<Table.Header>
 			<Table.Row>
 				<Table.Head>Schedule</Table.Head>
+				<Table.Head>Next run</Table.Head>
 				<Table.Head>Request</Table.Head>
 				<Table.Head>Job</Table.Head>
 				<Table.Head>Status</Table.Head>
@@ -37,8 +38,24 @@
 					<Table.Cell>
 						<div class="flex flex-col">
 							<span>{describeCron(j.cron).text}</span>
-							<code class="text-muted-foreground font-mono text-xs">{j.cron}</code>
+							<span class="text-muted-foreground text-xs">
+								<code class="font-mono">{j.cron}</code>
+								{#if j.next_run}· server {serverZone(j.next_run)}{/if}
+							</span>
 						</div>
+					</Table.Cell>
+					<Table.Cell>
+						{#if j.next_run}
+							{@const next = new Date(j.next_run)}
+							<div class="flex flex-col">
+								<span>{fromNow(next)}</span>
+								<span class="text-muted-foreground text-xs">
+									{next.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+								</span>
+							</div>
+						{:else}
+							<span class="text-muted-foreground">—</span>
+						{/if}
 					</Table.Cell>
 					<Table.Cell class="max-w-sm">
 						<div class="flex items-center gap-2">

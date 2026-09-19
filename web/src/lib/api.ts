@@ -7,13 +7,14 @@ export type Job = {
 	project?: string;
 	cron: string;
 	running: boolean;
+	next_run?: string;
 	task: {
 		type: string;
 		config: { url: string; method: string; header?: unknown; body?: unknown };
 	};
 };
 
-export type NewJob = Omit<Job, 'job' | 'running'>;
+export type NewJob = Omit<Job, 'job' | 'running' | 'next_run'>;
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
 	const res = await fetch(API_URL + path, {

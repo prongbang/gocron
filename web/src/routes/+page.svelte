@@ -28,8 +28,9 @@
 	);
 	const projects = $derived(groups.map(([p]) => p).filter((p) => p !== NO_PROJECT));
 
-	async function load() {
-		loading = true;
+	// silent: background refresh, keeps the Refresh button still
+	async function load(silent = false) {
+		if (!silent) loading = true;
 		try {
 			jobs = (await listJobs()).sort((a, b) => a.job.localeCompare(b.job));
 			error = '';
@@ -50,7 +51,12 @@
 		}
 	}
 
-	onMount(load);
+	onMount(() => {
+		load();
+		// Keep next-run times current.
+		const id = setInterval(() => load(true), 30_000);
+		return () => clearInterval(id);
+	});
 </script>
 
 <main class="mx-auto flex max-w-6xl flex-col gap-6 p-4 sm:p-8">
@@ -63,7 +69,7 @@
 			</p>
 		</div>
 		<div class="flex gap-2">
-			<Button variant="outline" onclick={load} disabled={loading}>
+			<Button variant="outline" onclick={() => load()} disabled={loading}>
 				<RefreshCwIcon data-icon="inline-start" class={cn(loading && 'animate-spin')} />
 				Refresh
 			</Button>
