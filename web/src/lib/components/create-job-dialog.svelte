@@ -10,12 +10,13 @@
 	import { toast } from 'svelte-sonner';
 	import { createJob } from '$lib/api';
 
-	let { oncreated }: { oncreated: () => void } = $props();
+	let { projects, oncreated }: { projects: string[]; oncreated: () => void } = $props();
 
 	const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
 	let open = $state(false);
 	let saving = $state(false);
+	let project = $state('');
 	let cron = $state('*/1 * * * *');
 	let method = $state('POST');
 	let url = $state('');
@@ -44,6 +45,7 @@
 		saving = true;
 		try {
 			const { job } = await createJob({
+				project: project.trim(),
 				cron: cron.trim(),
 				task: { type: 'api', config: { url: url.trim(), method, header: h, body: b } }
 			});
@@ -72,6 +74,15 @@
 			</Dialog.Header>
 
 			<Field.Group>
+				<Field.Field>
+					<Field.Label for="project">Project</Field.Label>
+					<Input id="project" list="projects" placeholder="e.g. billing" bind:value={project} />
+					<datalist id="projects">
+						{#each projects as p (p)}<option value={p}></option>{/each}
+					</datalist>
+					<Field.Description>Leave empty for no project.</Field.Description>
+				</Field.Field>
+
 				<Field.Field data-invalid={errors.cron ? true : undefined}>
 					<Field.Label for="cron">Cron</Field.Label>
 					<Input id="cron" class="font-mono" bind:value={cron} aria-invalid={!!errors.cron} />

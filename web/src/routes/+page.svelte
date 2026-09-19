@@ -1,25 +1,32 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as Card from '$lib/components/ui/card';
-	import * as Table from '$lib/components/ui/table';
 	import * as Empty from '$lib/components/ui/empty';
 	import * as Alert from '$lib/components/ui/alert';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
-	import CircleStopIcon from '@lucide/svelte/icons/circle-stop';
 	import CalendarClockIcon from '@lucide/svelte/icons/calendar-clock';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
+	import FolderIcon from '@lucide/svelte/icons/folder';
 	import { toast } from 'svelte-sonner';
 	import CreateJobDialog from '$lib/components/create-job-dialog.svelte';
+	import JobTable from '$lib/components/job-table.svelte';
 	import { cn } from '$lib/utils';
 	import { API_URL, listJobs, stopJob, type Job } from '$lib/api';
 
 	let jobs = $state<Job[]>([]);
 	let loading = $state(true);
 	let error = $state('');
+
+	const NO_PROJECT = 'No project';
+	// Named projects A→Z, jobs without a project last.
+	const groups = $derived(
+		Object.entries(Object.groupBy(jobs, (j) => j.project?.trim() || NO_PROJECT)).sort(
+			([a], [b]) => +(a === NO_PROJECT) - +(b === NO_PROJECT) || a.localeCompare(b)
+		) as [string, Job[]][]
+	);
+	const projects = $derived(groups.map(([p]) => p).filter((p) => p !== NO_PROJECT));
 
 	async function load() {
 		loading = true;
@@ -51,7 +58,8 @@
 		<div class="flex flex-col gap-1">
 			<h1 class="text-2xl font-semibold tracking-tight">gocron</h1>
 			<p class="text-muted-foreground text-sm">
-				Scheduler API <code class="font-mono">{API_URL}</code>
+				{jobs.length} jobs · {projects.length} projects ·
+				<code class="font-mono">{API_URL}</code>
 			</p>
 		</div>
 		<div class="flex gap-2">
@@ -59,7 +67,7 @@
 				<RefreshCwIcon data-icon="inline-start" class={cn(loading && 'animate-spin')} />
 				Refresh
 			</Button>
-			<CreateJobDialog oncreated={load} />
+			<CreateJobDialog {projects} oncreated={load} />
 		</div>
 	</header>
 
@@ -73,17 +81,15 @@
 		</Alert.Root>
 	{/if}
 
-	<Card.Root>
-		<Card.Header>
-			<Card.Title>Jobs</Card.Title>
-			<Card.Description>{jobs.length} scheduled</Card.Description>
-		</Card.Header>
-		<Card.Content>
-			{#if loading && !jobs.length}
-				<div class="flex flex-col gap-3">
-					{#each [1, 2, 3] as i (i)}<Skeleton class="h-10 w-full" />{/each}
-				</div>
-			{:else if !jobs.length}
+	{#if loading && !jobs.length}
+		<Card.Root>
+			<Card.Content class="flex flex-col gap-3">
+				{#each [1, 2, 3] as i (i)}<Skeleton class="h-10 w-full" />{/each}
+			</Card.Content>
+		</Card.Root>
+	{:else if !jobs.length}
+		<Card.Root>
+			<Card.Content>
 				<Empty.Root>
 					<Empty.Header>
 						<Empty.Media variant="icon"><CalendarClockIcon /></Empty.Media>
@@ -91,64 +97,22 @@
 						<Empty.Description>Create a job to call an endpoint on a schedule.</Empty.Description>
 					</Empty.Header>
 				</Empty.Root>
-			{:else}
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>Cron</Table.Head>
-							<Table.Head>Request</Table.Head>
-							<Table.Head>Job</Table.Head>
-							<Table.Head>Status</Table.Head>
-							<Table.Head class="text-right">Action</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each jobs as j (j.job)}
-							<Table.Row>
-								<Table.Cell class="font-mono">{j.cron}</Table.Cell>
-								<Table.Cell class="max-w-sm">
-									<div class="flex items-center gap-2">
-										<Badge variant="outline">{j.task.config.method}</Badge>
-										<span class="truncate" title={j.task.config.url}>{j.task.config.url}</span>
-									</div>
-								</Table.Cell>
-								<Table.Cell class="text-muted-foreground font-mono text-xs" title={j.job}>
-									{j.job.slice(0, 8)}
-								</Table.Cell>
-								<Table.Cell>
-									<Badge variant={j.running ? 'default' : 'secondary'}>
-										{j.running ? 'Running' : 'Stopped'}
-									</Badge>
-								</Table.Cell>
-								<Table.Cell class="text-right">
-									<AlertDialog.Root>
-										<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-											<CircleStopIcon data-icon="inline-start" />
-											Stop
-										</AlertDialog.Trigger>
-										<AlertDialog.Content>
-											<AlertDialog.Header>
-												<AlertDialog.Title>Stop this job?</AlertDialog.Title>
-												<AlertDialog.Description>
-													<code class="font-mono">{j.cron}</code>
-													{j.task.config.method}
-													{j.task.config.url} will be stopped and removed. This cannot be undone.
-												</AlertDialog.Description>
-											</AlertDialog.Header>
-											<AlertDialog.Footer>
-												<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-												<AlertDialog.Action variant="destructive" onclick={() => stop(j.job)}>
-													Stop job
-												</AlertDialog.Action>
-											</AlertDialog.Footer>
-										</AlertDialog.Content>
-									</AlertDialog.Root>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			{/if}
-		</Card.Content>
-	</Card.Root>
+			</Card.Content>
+		</Card.Root>
+	{:else}
+		{#each groups as [project, list] (project)}
+			<Card.Root>
+				<Card.Header>
+					<Card.Title class="flex items-center gap-2">
+						<FolderIcon class="text-muted-foreground size-4" />
+						{project}
+					</Card.Title>
+					<Card.Description>{list.length} {list.length === 1 ? 'job' : 'jobs'}</Card.Description>
+				</Card.Header>
+				<Card.Content>
+					<JobTable jobs={list} onstop={stop} />
+				</Card.Content>
+			</Card.Root>
+		{/each}
+	{/if}
 </main>

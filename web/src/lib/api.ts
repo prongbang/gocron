@@ -4,6 +4,7 @@ export const API_URL = (env.PUBLIC_GOCRON_API || 'http://localhost:8000').replac
 
 export type Job = {
 	job: string;
+	project?: string;
 	cron: string;
 	running: boolean;
 	task: {

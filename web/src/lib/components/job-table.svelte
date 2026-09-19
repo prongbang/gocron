@@ -1,0 +1,99 @@
+<script lang="ts">
+	import * as Table from '$lib/components/ui/table';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as Pagination from '$lib/components/ui/pagination';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import { Badge } from '$lib/components/ui/badge';
+	import CircleStopIcon from '@lucide/svelte/icons/circle-stop';
+	import type { Job } from '$lib/api';
+
+	let { jobs, onstop }: { jobs: Job[]; onstop: (job: string) => void } = $props();
+
+	const PER_PAGE = 10;
+	let page = $state(1);
+	const pageCount = $derived(Math.max(1, Math.ceil(jobs.length / PER_PAGE)));
+	// Stopping the last job on the last page would leave an empty page.
+	$effect(() => {
+		if (page > pageCount) page = pageCount;
+	});
+	const rows = $derived(jobs.slice((page - 1) * PER_PAGE, page * PER_PAGE));
+</script>
+
+<div class="flex flex-col gap-4">
+	<Table.Root>
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>Cron</Table.Head>
+				<Table.Head>Request</Table.Head>
+				<Table.Head>Job</Table.Head>
+				<Table.Head>Status</Table.Head>
+				<Table.Head class="text-right">Action</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each rows as j (j.job)}
+				<Table.Row>
+					<Table.Cell class="font-mono">{j.cron}</Table.Cell>
+					<Table.Cell class="max-w-sm">
+						<div class="flex items-center gap-2">
+							<Badge variant="outline">{j.task.config.method}</Badge>
+							<span class="truncate" title={j.task.config.url}>{j.task.config.url}</span>
+						</div>
+					</Table.Cell>
+					<Table.Cell class="text-muted-foreground font-mono text-xs" title={j.job}>
+						{j.job.slice(0, 8)}
+					</Table.Cell>
+					<Table.Cell>
+						<Badge variant={j.running ? 'default' : 'secondary'}>
+							{j.running ? 'Running' : 'Stopped'}
+						</Badge>
+					</Table.Cell>
+					<Table.Cell class="text-right">
+						<AlertDialog.Root>
+							<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+								<CircleStopIcon data-icon="inline-start" />
+								Stop
+							</AlertDialog.Trigger>
+							<AlertDialog.Content>
+								<AlertDialog.Header>
+									<AlertDialog.Title>Stop this job?</AlertDialog.Title>
+									<AlertDialog.Description>
+										<code class="font-mono">{j.cron}</code>
+										{j.task.config.method}
+										{j.task.config.url} will be stopped and removed. This cannot be undone.
+									</AlertDialog.Description>
+								</AlertDialog.Header>
+								<AlertDialog.Footer>
+									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+									<AlertDialog.Action variant="destructive" onclick={() => onstop(j.job)}>
+										Stop job
+									</AlertDialog.Action>
+								</AlertDialog.Footer>
+							</AlertDialog.Content>
+						</AlertDialog.Root>
+					</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
+
+	{#if jobs.length > PER_PAGE}
+		<Pagination.Root count={jobs.length} perPage={PER_PAGE} bind:page>
+			{#snippet children({ pages, currentPage })}
+				<Pagination.Content>
+					<Pagination.Item><Pagination.Previous /></Pagination.Item>
+					{#each pages as p (p.key)}
+						<Pagination.Item>
+							{#if p.type === 'ellipsis'}
+								<Pagination.Ellipsis />
+							{:else}
+								<Pagination.Link page={p} isActive={currentPage === p.value} />
+							{/if}
+						</Pagination.Item>
+					{/each}
+					<Pagination.Item><Pagination.Next /></Pagination.Item>
+				</Pagination.Content>
+			{/snippet}
+		</Pagination.Root>
+	{/if}
+</div>
