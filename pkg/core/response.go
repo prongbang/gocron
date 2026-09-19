@@ -52,3 +52,17 @@ func NotFound(c *fiber.Ctx, message any) error {
 	}
 	return c.Status(http.StatusNotFound).JSON(resp)
 }
+
+func Unauthorized(c *fiber.Ctx) error {
+	return c.Status(http.StatusUnauthorized).JSON(Response{
+		Code:    fmt.Sprintf("%d", http.StatusUnauthorized),
+		Message: http.StatusText(http.StatusUnauthorized),
+	})
+}
+
+func Forbidden(c *fiber.Ctx) error {
+	return c.Status(http.StatusForbidden).JSON(Response{
+		Code:    fmt.Sprintf("%d", http.StatusForbidden),
+		Message: http.StatusText(http.StatusForbidden),
+	})
+}
