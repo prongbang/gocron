@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: gocron
-          image: prongbang/gocron:latest
+          image: prongbang/gocron:1.2.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
