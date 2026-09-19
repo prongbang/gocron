@@ -1,13 +1,15 @@
-# web stage: build the dashboard that gets embedded into the binary
-FROM oven/bun:1-alpine AS web
+# web stage: build the dashboard that gets embedded into the binary.
+# Static files are platform-independent, so build once on the host platform.
+FROM --platform=$BUILDPLATFORM oven/bun:1-alpine AS web
 WORKDIR /web
 COPY web/package.json web/bun.lockb ./
 RUN bun install --frozen-lockfile
 COPY web/ .
 RUN bun run build
 
-# build stage
-FROM golang:alpine AS builder
+# build stage: cross-compile for the target platform instead of emulating it
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
+ARG TARGETOS TARGETARCH
 
 ENV GO111MODULE=on
 
@@ -23,7 +25,7 @@ COPY --from=web /web/build web/build
 RUN go mod vendor
 
 # With go ≥ 1.10
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags="-w -s" -o /go/bin/gocron cmd/gocron/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags="-w -s" -o /go/bin/gocron cmd/gocron/main.go
 
 # small image
 FROM alpine:3.18.3
