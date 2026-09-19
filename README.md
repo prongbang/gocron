@@ -2,6 +2,8 @@
 
 [Gocron](https://hub.docker.com/r/prongbang/gocron) manages cron jobs with a configuration.
 
+![gocron web dashboard](docs/preview.svg)
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/prongbang)
 
 ## Install by Source

@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-labelledby="preview-title preview-desc">
+  <title id="preview-title">gocron dashboard product preview</title>
+  <desc id="preview-desc">A dark gocron web dashboard showing scheduled HTTP jobs grouped by project, with a compact history panel.</desc>
+  <defs>
+    <linearGradient id="backdrop" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0a0a0a"/>
+      <stop offset="0.56" stop-color="#0b0d12"/>
+      <stop offset="1" stop-color="#09100f"/>
+    </linearGradient>
+    <radialGradient id="blue-glow" cx="0" cy="0" r="1" gradientTransform="translate(212 184) rotate(37) scale(572 423)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mint-glow" cx="0" cy="0" r="1" gradientTransform="translate(1103 654) rotate(-146) scale(454 369)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEAD4" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#5EEAD4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#5EEAD4"/>
+    </linearGradient>
+    <filter id="window-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000" flood-opacity=".48"/>
+    </filter>
+    <filter id="panel-shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity=".52"/>
+    </filter>
+    <clipPath id="app-clip"><rect x="78" y="184" width="1000" height="560" rx="15"/></clipPath>
+    <clipPath id="history-clip"><rect x="878" y="500" width="330" height="230" rx="13"/></clipPath>
+    <style>
+      .sans { font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .title { fill: #fafafa; font-size: 25px; font-weight: 650; letter-spacing: -.5px; }
+      .body { fill: #fafafa; font-size: 11px; }
+      .small { fill: #a1a1a1; font-size: 9px; }
+      .head { fill: #a1a1a1; font-size: 8px; font-weight: 650; letter-spacing: .7px; }
+      .button { fill: #fafafa; font-size: 10px; font-weight: 560; }
+      .nav { fill: #a1a1a1; font-size: 11px; font-weight: 550; }
+      .nav-active { fill: #fafafa; font-size: 11px; font-weight: 620; }
+    </style>
+  </defs>
+
+  <!-- Fixed dark presentation layer keeps the preview consistent on GitHub themes. -->
+  <rect width="1280" height="800" fill="url(#backdrop)"/>
+  <rect width="1280" height="800" fill="url(#blue-glow)"/>
+  <rect width="1280" height="800" fill="url(#mint-glow)"/>
+  <path d="M0 152C195 94 300 151 458 116C635 77 761 33 988 79C1130 108 1219 84 1280 52" fill="none" stroke="#fff" stroke-opacity=".035"/>
+  <path d="M0 738C248 688 357 769 566 735C828 691 1053 730 1280 642" fill="none" stroke="#fff" stroke-opacity=".035"/>
+
+  <g class="sans">
+    <rect x="104" y="60" width="88" height="24" rx="12" fill="#2563EB" fill-opacity=".14" stroke="#2563EB" stroke-opacity=".42"/>
+    <circle cx="120" cy="72" r="4" fill="#5EEAD4"/>
+    <text x="131" y="75.5" fill="#bcd3ff" font-size="10" font-weight="650" letter-spacing=".6">GOCRON</text>
+    <text x="104" y="122" fill="#fafafa" font-size="29" font-weight="630" letter-spacing="-.75">Schedule HTTP jobs with cron</text>
+    <text x="104" y="152" fill="#a1a1a1" font-size="16">— from a config file or a web UI.</text>
+    <rect x="104" y="166" width="292" height="2" rx="1" fill="url(#rule)"/>
+  </g>
+
+  <!-- Browser / Jobs page -->
+  <g filter="url(#window-shadow)">
+    <rect x="78" y="184" width="1000" height="560" rx="15" fill="#0a0a0a" stroke="#fff" stroke-opacity=".15"/>
+  </g>
+  <g clip-path="url(#app-clip)" class="sans">
+    <!-- Browser's subtle top edge and app navigation -->
+    <rect x="78" y="184" width="1000" height="52" fill="#101010"/>
+    <path d="M78 236H1078" stroke="#fff" stroke-opacity=".10"/>
+    <circle cx="105" cy="210" r="4" fill="#f87171" fill-opacity=".9"/>
+    <circle cx="119" cy="210" r="4" fill="#fbbf24" fill-opacity=".9"/>
+    <circle cx="133" cy="210" r="4" fill="#5eead4" fill-opacity=".9"/>
+
+    <!-- Logo mark from ./logo.svg, inlined verbatim. -->
+    <svg x="159" y="196" width="28" height="28" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+      <title id="title">gocron time-loop mark</title>
+      <!-- A clock drawn as an open, looping lowercase g. -->
+      <path d="M48.1 21.1A21 21 0 1 0 50.5 39.7" fill="none" stroke="#2563EB" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M49.8 35.5H34.4" fill="none" stroke="#2563EB" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M49.8 35.5v5.8a10.3 10.3 0 0 1-10.3 10.3h-1.4" fill="none" stroke="#2563EB" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M31.8 22.2v10l7.8 4.7" fill="none" stroke="#5EEAD4" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="m46.7 16.4 7.2 4.5-6.2 3.4z" fill="#5EEAD4"/>
+    </svg>
+    <text x="196" y="215" fill="#fafafa" font-size="15" font-weight="680" letter-spacing="-.25">gocron</text>
+    <rect x="275" y="195" width="54" height="30" rx="7" fill="#272727"/>
+    <text x="292" y="214" class="nav-active">Jobs</text>
+    <text x="347" y="214" class="nav">History</text>
+
+    <rect x="78" y="237" width="1000" height="507" fill="#0a0a0a"/>
+    <!-- Content header -->
+    <text x="110" y="283" class="title">Jobs</text>
+    <text x="110" y="303" class="small">3 jobs · 3 projects · <tspan class="mono">http://localhost:8000</tspan></text>
+    <rect x="820" y="263" width="76" height="32" rx="8" fill="#171717" stroke="#fff" stroke-opacity=".14"/>
+    <path d="M836 276a6 6 0 1 1-1.4 6.2M834 281l.7-4.3 3.8 1.8" fill="none" stroke="#a1a1a1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="851" y="283" class="button">Refresh</text>
+    <rect x="905" y="263" width="112" height="32" rx="8" fill="#fafafa"/>
+    <path d="M921 274v10M916 279h10" stroke="#171717" stroke-width="1.4" stroke-linecap="round"/>
+    <text x="934" y="283" fill="#171717" font-size="10" font-weight="650">New job</text>
+
+    <!-- billing project -->
+    <g>
+      <rect x="108" y="325" width="940" height="111" rx="12" fill="#171717" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M108 365H1048M108 392H1048" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M126 342h10l2 3h10v10h-22z" fill="none" stroke="#a1a1a1" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="157" y="347" fill="#fafafa" font-size="12" font-weight="640">billing</text>
+      <text x="157" y="360" class="small">1 job</text>
+      <text x="126" y="383" class="head">SCHEDULE</text>
+      <text x="300" y="383" class="head">NEXT RUN</text>
+      <text x="430" y="383" class="head">REQUEST</text>
+      <text x="694" y="383" class="head">JOB</text>
+      <text x="773" y="383" class="head">STATUS</text>
+      <text x="912" y="383" class="head">ACTION</text>
+      <text x="126" y="413" class="mono body">0 1 * * *</text>
+      <text x="126" y="427" class="small">At 01:00 · server UTC+07:00</text>
+      <text x="300" y="413" class="body">in 22 hours</text>
+      <text x="300" y="427" class="small">Sep 20, 2026, 01:00</text>
+      <rect x="430" y="401" width="31" height="17" rx="4" fill="#171717" stroke="#fff" stroke-opacity=".18"/>
+      <text x="437" y="412.5" fill="#d4d4d4" font-size="8" font-weight="700">POST</text>
+      <text x="470" y="413" class="body">api.example.com/invoices/sync</text>
+      <text x="694" y="413" class="mono small">8f2a71c9</text>
+      <rect x="773" y="400" width="53" height="19" rx="9.5" fill="#2563EB" fill-opacity=".24" stroke="#2563EB" stroke-opacity=".6"/>
+      <circle cx="784" cy="409.5" r="3" fill="#5EEAD4"/>
+      <text x="791" y="412.5" fill="#d8fdf7" font-size="8" font-weight="650">Running</text>
+      <text x="885" y="413" fill="#d4d4d4" font-size="10" font-weight="560">History</text>
+      <path d="M940 404v11m-5.5-5.5h11" stroke="#a1a1a1" stroke-width="1.1" stroke-linecap="round"/>
+      <text x="950" y="413" fill="#d4d4d4" font-size="10" font-weight="560">Stop</text>
+    </g>
+
+    <!-- reports project -->
+    <g>
+      <rect x="108" y="449" width="940" height="111" rx="12" fill="#171717" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M108 489H1048M108 516H1048" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M126 466h10l2 3h10v10h-22z" fill="none" stroke="#a1a1a1" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="157" y="471" fill="#fafafa" font-size="12" font-weight="640">reports</text>
+      <text x="157" y="484" class="small">1 job</text>
+      <text x="126" y="507" class="head">SCHEDULE</text>
+      <text x="300" y="507" class="head">NEXT RUN</text>
+      <text x="430" y="507" class="head">REQUEST</text>
+      <text x="694" y="507" class="head">JOB</text>
+      <text x="773" y="507" class="head">STATUS</text>
+      <text x="912" y="507" class="head">ACTION</text>
+      <text x="126" y="537" class="mono body">0 */6 * * *</text>
+      <text x="126" y="551" class="small">Every 6 hours · server UTC+07:00</text>
+      <text x="300" y="537" class="body">in 4 hours</text>
+      <text x="300" y="551" class="small">Sep 19, 2026, 18:00</text>
+      <rect x="430" y="525" width="27" height="17" rx="4" fill="#171717" stroke="#fff" stroke-opacity=".18"/>
+      <text x="437" y="536.5" fill="#d4d4d4" font-size="8" font-weight="700">GET</text>
+      <text x="466" y="537" class="body">reports.internal/daily</text>
+      <text x="694" y="537" class="mono small">84dd53be</text>
+      <rect x="773" y="524" width="53" height="19" rx="9.5" fill="#2563EB" fill-opacity=".24" stroke="#2563EB" stroke-opacity=".6"/>
+      <circle cx="784" cy="533.5" r="3" fill="#5EEAD4"/>
+      <text x="791" y="536.5" fill="#d8fdf7" font-size="8" font-weight="650">Running</text>
+      <text x="885" y="537" fill="#d4d4d4" font-size="10" font-weight="560">History</text>
+      <path d="M940 528v11m-5.5-5.5h11" stroke="#a1a1a1" stroke-width="1.1" stroke-linecap="round"/>
+      <text x="950" y="537" fill="#d4d4d4" font-size="10" font-weight="560">Stop</text>
+    </g>
+
+    <!-- health project -->
+    <g>
+      <rect x="108" y="573" width="940" height="111" rx="12" fill="#171717" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M108 613H1048M108 640H1048" stroke="#fff" stroke-opacity=".10"/>
+      <path d="M126 590h10l2 3h10v10h-22z" fill="none" stroke="#a1a1a1" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="157" y="595" fill="#fafafa" font-size="12" font-weight="640">health</text>
+      <text x="157" y="608" class="small">1 job</text>
+      <text x="126" y="631" class="head">SCHEDULE</text>
+      <text x="300" y="631" class="head">NEXT RUN</text>
+      <text x="430" y="631" class="head">REQUEST</text>
+      <text x="694" y="631" class="head">JOB</text>
+      <text x="773" y="631" class="head">STATUS</text>
+      <text x="912" y="631" class="head">ACTION</text>
+      <text x="126" y="661" class="mono body">*/5 * * * *</text>
+      <text x="126" y="675" class="small">Every 5 minutes · server UTC+07:00</text>
+      <text x="300" y="661" class="body">in 2 minutes</text>
+      <text x="300" y="675" class="small">Sep 19, 2026, 14:05</text>
+      <rect x="430" y="649" width="27" height="17" rx="4" fill="#171717" stroke="#fff" stroke-opacity=".18"/>
+      <text x="437" y="660.5" fill="#d4d4d4" font-size="8" font-weight="700">GET</text>
+      <text x="466" y="661" class="body">status.service.dev/health</text>
+      <text x="694" y="661" class="mono small">0ce4b0ef</text>
+      <rect x="773" y="648" width="53" height="19" rx="9.5" fill="#2563EB" fill-opacity=".24" stroke="#2563EB" stroke-opacity=".6"/>
+      <circle cx="784" cy="657.5" r="3" fill="#5EEAD4"/>
+      <text x="791" y="660.5" fill="#d8fdf7" font-size="8" font-weight="650">Running</text>
+      <text x="885" y="661" fill="#d4d4d4" font-size="10" font-weight="560">History</text>
+      <path d="M940 652v11m-5.5-5.5h11" stroke="#a1a1a1" stroke-width="1.1" stroke-linecap="round"/>
+      <text x="950" y="661" fill="#d4d4d4" font-size="10" font-weight="560">Stop</text>
+    </g>
+  </g>
+
+  <!-- Compact overlapping History page, reflecting the real run list rather than an invented feature. -->
+  <g filter="url(#panel-shadow)">
+    <rect x="878" y="500" width="330" height="230" rx="13" fill="#171717" stroke="#fff" stroke-opacity=".16"/>
+  </g>
+  <g clip-path="url(#history-clip)" class="sans">
+    <rect x="878" y="500" width="330" height="38" fill="#202020"/>
+    <text x="898" y="524" fill="#fafafa" font-size="13" font-weight="650">History</text>
+    <text x="958" y="524" class="small">Every job run · newest first</text>
+    <path d="M878 538H1208" stroke="#fff" stroke-opacity=".10"/>
+    <text x="898" y="557" class="head">TIME</text>
+    <text x="970" y="557" class="head">STATUS</text>
+    <text x="1028" y="557" class="head">REQUEST</text>
+    <path d="M894 570H1192M894 612H1192M894 654H1192" stroke="#fff" stroke-opacity=".09"/>
+    <text x="898" y="580" class="body">2 min ago</text>
+    <text x="898" y="593" class="small">billing</text>
+    <rect x="970" y="570" width="30" height="17" rx="4" fill="#2a2a2a" stroke="#fff" stroke-opacity=".12"/>
+    <text x="978" y="581.5" fill="#e5e5e5" font-size="8" font-weight="700">200</text>
+    <text x="1028" y="580" class="body">POST /invoices/sync</text>
+    <text x="1028" y="593" class="small">184 ms</text>
+    <text x="898" y="622" class="body">8 min ago</text>
+    <text x="898" y="635" class="small">reports</text>
+    <rect x="970" y="612" width="30" height="17" rx="4" fill="#2a2a2a" stroke="#fff" stroke-opacity=".12"/>
+    <text x="978" y="623.5" fill="#e5e5e5" font-size="8" font-weight="700">200</text>
+    <text x="1028" y="622" class="body">GET /daily</text>
+    <text x="1028" y="635" class="small">96 ms</text>
+    <text x="898" y="664" class="body">11 min ago</text>
+    <text x="898" y="677" class="small">health</text>
+    <rect x="970" y="654" width="30" height="17" rx="4" fill="#7f1d1d" fill-opacity=".78" stroke="#f87171" stroke-opacity=".55"/>
+    <text x="978" y="665.5" fill="#fee2e2" font-size="8" font-weight="700">404</text>
+    <text x="1028" y="664" class="body">GET /health</text>
+    <text x="1028" y="677" fill="#fca5a5" font-size="9">connection refused</text>
+    <path d="M878 692H1208" stroke="#fff" stroke-opacity=".10"/>
+    <text x="898" y="712" class="small">Runs are kept for 7 days</text>
+    <text x="1136" y="712" fill="#d4d4d4" font-size="9" font-weight="600">View all →</text>
+  </g>
+
+  <g class="sans">
+    <circle cx="1131" cy="164" r="3" fill="#5EEAD4" fill-opacity=".9"/>
+    <circle cx="1150" cy="164" r="3" fill="#2563EB" fill-opacity=".9"/>
+    <text x="1165" y="168" fill="#a1a1a1" font-size="10" font-weight="600">WEB DASHBOARD</text>
+  </g>
+</svg>
