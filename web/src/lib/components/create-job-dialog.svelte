@@ -9,6 +9,7 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { toast } from 'svelte-sonner';
 	import { createJob } from '$lib/api';
+	import { describeCron } from '$lib/cron';
 
 	let { projects, oncreated }: { projects: string[]; oncreated: () => void } = $props();
 
@@ -23,6 +24,7 @@
 	let header = $state('');
 	let body = $state('');
 	let errors = $state<Record<string, string>>({});
+	const preview = $derived(describeCron(cron));
 
 	function parseJSON(key: string, text: string) {
 		if (!text.trim()) return undefined;
@@ -87,8 +89,12 @@
 					<Field.Label for="cron">Cron</Field.Label>
 					<Input id="cron" class="font-mono" bind:value={cron} aria-invalid={!!errors.cron} />
 					<Field.Description>
-						e.g. <code>0 0 * * *</code> — check it on
-						<a href="https://crontab.guru/" target="_blank" rel="noreferrer">crontab.guru</a>
+						{#if preview.ok}
+							<span class="text-foreground">{preview.text}</span>
+						{:else}
+							{preview.text}
+						{/if}
+						· <a href="https://crontab.guru/" target="_blank" rel="noreferrer">crontab.guru</a>
 					</Field.Description>
 					{#if errors.cron}<Field.Error>{errors.cron}</Field.Error>{/if}
 				</Field.Field>

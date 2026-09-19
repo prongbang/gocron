@@ -6,6 +6,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import CircleStopIcon from '@lucide/svelte/icons/circle-stop';
 	import type { Job } from '$lib/api';
+	import { describeCron } from '$lib/cron';
 
 	let { jobs, onstop }: { jobs: Job[]; onstop: (job: string) => void } = $props();
 
@@ -23,7 +24,7 @@
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
-				<Table.Head>Cron</Table.Head>
+				<Table.Head>Schedule</Table.Head>
 				<Table.Head>Request</Table.Head>
 				<Table.Head>Job</Table.Head>
 				<Table.Head>Status</Table.Head>
@@ -33,7 +34,12 @@
 		<Table.Body>
 			{#each rows as j (j.job)}
 				<Table.Row>
-					<Table.Cell class="font-mono">{j.cron}</Table.Cell>
+					<Table.Cell>
+						<div class="flex flex-col">
+							<span>{describeCron(j.cron).text}</span>
+							<code class="text-muted-foreground font-mono text-xs">{j.cron}</code>
+						</div>
+					</Table.Cell>
 					<Table.Cell class="max-w-sm">
 						<div class="flex items-center gap-2">
 							<Badge variant="outline">{j.task.config.method}</Badge>
