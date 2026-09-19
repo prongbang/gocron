@@ -1,0 +1,6 @@
+p, admin, /v1/*, ^(GET|POST|PUT|DELETE)$
+p, editor, /v1/scheduler, ^(GET|POST)$
+p, editor, /v1/scheduler/stop, ^POST$
+p, editor, /v1/history, ^GET$
+p, viewer, /v1/scheduler, ^GET$
+p, viewer, /v1/history, ^GET$
