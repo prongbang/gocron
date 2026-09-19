@@ -1,10 +1,11 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import * as Pagination from '$lib/components/ui/pagination';
+	import Pager from '$lib/components/pager.svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
 	import CircleStopIcon from '@lucide/svelte/icons/circle-stop';
+	import HistoryIcon from '@lucide/svelte/icons/history';
 	import type { Job } from '$lib/api';
 	import { describeCron, fromNow, serverZone } from '$lib/cron';
 
@@ -12,11 +13,6 @@
 
 	const PER_PAGE = 10;
 	let page = $state(1);
-	const pageCount = $derived(Math.max(1, Math.ceil(jobs.length / PER_PAGE)));
-	// Stopping the last job on the last page would leave an empty page.
-	$effect(() => {
-		if (page > pageCount) page = pageCount;
-	});
 	const rows = $derived(jobs.slice((page - 1) * PER_PAGE, page * PER_PAGE));
 </script>
 
@@ -71,7 +67,11 @@
 							{j.running ? 'Running' : 'Stopped'}
 						</Badge>
 					</Table.Cell>
-					<Table.Cell class="text-right">
+					<Table.Cell class="text-right whitespace-nowrap">
+						<a href="/history?job={j.job}" class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+							<HistoryIcon data-icon="inline-start" />
+							History
+						</a>
 						<AlertDialog.Root>
 							<AlertDialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
 								<CircleStopIcon data-icon="inline-start" />
@@ -100,23 +100,5 @@
 		</Table.Body>
 	</Table.Root>
 
-	{#if jobs.length > PER_PAGE}
-		<Pagination.Root count={jobs.length} perPage={PER_PAGE} bind:page>
-			{#snippet children({ pages, currentPage })}
-				<Pagination.Content>
-					<Pagination.Item><Pagination.Previous /></Pagination.Item>
-					{#each pages as p (p.key)}
-						<Pagination.Item>
-							{#if p.type === 'ellipsis'}
-								<Pagination.Ellipsis />
-							{:else}
-								<Pagination.Link page={p} isActive={currentPage === p.value} />
-							{/if}
-						</Pagination.Item>
-					{/each}
-					<Pagination.Item><Pagination.Next /></Pagination.Item>
-				</Pagination.Content>
-			{/snippet}
-		</Pagination.Root>
-	{/if}
+	<Pager count={jobs.length} perPage={PER_PAGE} bind:page />
 </div>

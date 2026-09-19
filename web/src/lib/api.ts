@@ -40,3 +40,18 @@ export const createJob = (job: NewJob) =>
 
 export const stopJob = (job: string) =>
 	call<{ job: string }>('/v1/scheduler/stop', { method: 'POST', body: JSON.stringify({ job }) });
+
+export type History = {
+	job: string;
+	project: string;
+	cron: string;
+	method: string;
+	url: string;
+	status: number;
+	response?: string;
+	started_at: string;
+	duration_ms: number;
+};
+
+export const listHistory = async (job = '', limit = 500) =>
+	(await call<History[] | null>(`/v1/history?${new URLSearchParams({ job, limit: String(limit) })}`)) ?? [];

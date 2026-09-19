@@ -62,7 +62,7 @@
 <main class="mx-auto flex max-w-6xl flex-col gap-6 p-4 sm:p-8">
 	<header class="flex flex-wrap items-center justify-between gap-4">
 		<div class="flex flex-col gap-1">
-			<h1 class="text-2xl font-semibold tracking-tight">gocron</h1>
+			<h1 class="text-2xl font-semibold tracking-tight">Jobs</h1>
 			<p class="text-muted-foreground text-sm">
 				{jobs.length} jobs · {projects.length} projects ·
 				<code class="font-mono">{API_URL}</code>
