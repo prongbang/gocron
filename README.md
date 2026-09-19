@@ -9,7 +9,7 @@
 ## Install by Source
 
 ```shell
-go get github.com/prongbang/gocron
+go get github.com/prongbang/gocron@v1.2.0
 ```
 
 Using
@@ -36,7 +36,7 @@ func main() {
 ```yaml
 services:
   gocron:
-    image: prongbang/gocron:latest
+    image: prongbang/gocron:1.2.0
     ports:
       - "8000:8000"
     environment:
@@ -247,7 +247,7 @@ project
 ```yml
 services:
   gocron:
-    image: prongbang/gocron:latest
+    image: prongbang/gocron:1.2.0
     environment:
       - TZ=Asia/Bangkok
       - GOCRON_API=true
@@ -264,7 +264,7 @@ services:
 ```yml
 services:
   gocron:
-    image: prongbang/gocron:latest
+    image: prongbang/gocron:1.2.0
     environment:
       - TZ=Asia/Bangkok
       - GOCRON_BUILDIN=true
@@ -283,7 +283,7 @@ services:
 ```yml
 services:
   gocron:
-    image: prongbang/gocron:latest
+    image: prongbang/gocron:1.2.0
     environment:
       - TZ=Asia/Bangkok
       - GOCRON_BUILDIN=true
