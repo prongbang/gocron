@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import logo from '$lib/assets/logo.svg';
 	import { ModeWatcher } from 'mode-watcher';
 	import { page } from '$app/state';
 	import { Toaster } from '$lib/components/ui/sonner';
@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href={logo} type="image/svg+xml" />
 	<title>gocron</title>
 </svelte:head>
 
@@ -23,7 +23,10 @@
 <Toaster richColors />
 <nav class="border-b">
 	<div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-8">
-		<span class="font-semibold tracking-tight">gocron</span>
+		<a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
+			<img src={logo} alt="" class="size-6" />
+			gocron
+		</a>
 		<div class="flex gap-1">
 			{#each links as l (l.href)}
 				{@const active = page.url.pathname === l.href}
