@@ -105,7 +105,14 @@ func (a *Auth) login(c *fiber.Ctx) error {
 
 func (a *Auth) logout(c *fiber.Ctx) error {
 	_ = a.Store.DeleteSession(tokenFrom(c))
-	c.ClearCookie(cookieName)
+	// Not c.ClearCookie: it omits Path, so the browser would scope the delete to /v1/auth and keep the "/" cookie.
+	c.Cookie(&fiber.Cookie{
+		Name:     cookieName,
+		Path:     "/",
+		Expires:  time.Unix(1, 0),
+		HTTPOnly: true,
+		SameSite: fiber.CookieSameSiteStrictMode,
+	})
 	return core.Ok(c, nil)
 }
 

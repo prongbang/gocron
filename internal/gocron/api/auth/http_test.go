@@ -129,3 +129,15 @@ func TestLoginCookie(t *testing.T) {
 		}
 	}
 }
+
+func TestLogoutClearsCookie(t *testing.T) {
+	app := newTestApp(t)
+	res := do(t, app, "POST", "/v1/auth/logout", loginAs(t, app, "vic", "password1"), "")
+	cookie := strings.ToLower(res.Header.Get("Set-Cookie"))
+	// Without path=/ the browser scopes the delete to /v1/auth and keeps the real cookie.
+	for _, want := range []string{"gocron_session=", "path=/;", "expires="} {
+		if !strings.Contains(cookie+";", want) {
+			t.Errorf("Set-Cookie %q lacks %q", cookie, want)
+		}
+	}
+}
