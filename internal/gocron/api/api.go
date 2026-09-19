@@ -11,6 +11,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/prongbang/gocron/internal/gocron/api/auth"
+	"github.com/prongbang/gocron/pkg/core"
 	"github.com/prongbang/gocron/web"
 )
 
@@ -20,6 +22,7 @@ type API interface {
 
 type api struct {
 	Router Routers
+	Auth   *auth.Auth
 }
 
 func (a *api) Register() {
@@ -34,6 +37,13 @@ func (a *api) Register() {
 		AllowHeaders: "X-Platform, X-Api-Key, Authorization, Access-Control-Allow-Credentials, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Origin, Content-Type, Accept",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
 	}))
+
+	// Auth must be registered before the routes it protects.
+	if a.Auth != nil {
+		a.Auth.Routes(app)
+	} else {
+		app.Get("/v1/auth/me", func(c *fiber.Ctx) error { return core.Ok(c, fiber.Map{"auth": false}) })
+	}
 
 	// Routers
 	a.Router.Initials(app)
@@ -53,8 +63,9 @@ func (a *api) Register() {
 	_ = app.Listen(":8000")
 }
 
-func NewAPI(router Routers) API {
+func NewAPI(router Routers, authn *auth.Auth) API {
 	return &api{
 		Router: router,
+		Auth:   authn,
 	}
 }

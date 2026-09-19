@@ -50,6 +50,34 @@ With `GOCRON_API=true`, open [http://localhost:8000](http://localhost:8000) to m
 
 Building from source? Run `make build` (needs [bun](https://bun.sh)) so the dashboard is embedded; a plain `go build` still works but serves the API only.
 
+### Authentication
+
+Off by default. Turn it on with:
+
+```yaml
+    environment:
+      - GOCRON_API=true
+      - GOCRON_AUTH=true
+      - GOCRON_ADMIN_USER=admin          # first admin, created only when no user exists
+      - GOCRON_ADMIN_PASSWORD=change-me  # 8-72 characters
+```
+
+| Role | Can |
+|---|---|
+| `viewer` | See jobs and history |
+| `editor` | Also create and stop jobs |
+| `admin` | Also manage users (`/v1/users`) |
+
+The dashboard signs in with a cookie. Scripts get a token (valid 24h) and send it as a Bearer header:
+
+```shell
+TOKEN=$(curl -s localhost:8000/v1/auth/login -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"change-me"}' | jq -r .data.token)
+curl -H "Authorization: Bearer $TOKEN" localhost:8000/v1/scheduler
+```
+
+Put gocron behind HTTPS (a reverse proxy) when it is reachable from outside your machine.
+
 ### Create
 
 - `POST http://localhost:8000/v1/scheduler`
